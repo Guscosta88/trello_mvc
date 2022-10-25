@@ -3,6 +3,7 @@ from init import db, ma, bcrypt, jwt
 from flask_sqlalchemy import SQLAlchemy
 from controllers.cards_controller import cards_bp
 from controllers.auth_controller import auth_bp
+from controllers.cli_controller import db_commands
 import os
 
 
@@ -12,7 +13,11 @@ def create_app():
 
     @app.errorhandler(404)
     def not_found(err):
-        return {'error': 'Not Found'}, 404
+        return {'error': str(err)}, 404
+
+    @app.errorhandler(401)
+    def unauthorized(err):
+        return {'error': str(err)}, 401
 
     app.config ['JSON_SORT_KEYS'] = False
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
@@ -25,5 +30,6 @@ def create_app():
 
     app.register_blueprint(cards_bp)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(db_commands)
 
     return app
